@@ -18,7 +18,6 @@ class TableViewController: UITableViewController {
         // путь до контекста NSPersistentContainer
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
-        
         // запрос на данные
         let fetchRequest: NSFetchRequest<Tasks> = Tasks.fetchRequest()
         
@@ -70,6 +69,31 @@ class TableViewController: UITableViewController {
         ac.addAction(saveTask)
         ac.addAction(cancelAction)
         present(ac, animated: true, completion: nil)
+    }
+    
+    @IBAction func deleteTask(_ sender: UIBarButtonItem) {
+        // путь до контекста NSPersistentContainer
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        // запрос на данные
+        let fetchRequest: NSFetchRequest<Tasks> = Tasks.fetchRequest()
+        
+        // удаление задачи из CoreData
+        if let tasks = try? context.fetch(fetchRequest) {
+            for task in tasks {
+                context.delete(task)
+            }
+        }
+        
+        // запись контекста
+        do {
+            try context.save()
+        } catch let error as NSError{
+            print(error.localizedDescription)
+        }
+        
+        // обновление TableView
+        tableView.reloadData()  
     }
     
     // MARK: - Table view data source
